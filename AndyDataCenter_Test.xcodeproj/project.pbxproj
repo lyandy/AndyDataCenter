@@ -68,7 +68,6 @@
 		B625CA851E093D9600FCEC16 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B625CA931E093E8C00FCEC16 /* FMDatabaseQueue+Async.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FMDatabaseQueue+Async.h"; sourceTree = "<group>"; };
 		B625CA941E093E8C00FCEC16 /* FMDatabaseQueue+Async.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "FMDatabaseQueue+Async.m"; sourceTree = "<group>"; };
-		B625CA951E093E8C00FCEC16 /* GYDataCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GYDataCenter.h; sourceTree = "<group>"; };
 		B625CA961E093E8C00FCEC16 /* GYDataContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GYDataContext.h; sourceTree = "<group>"; };
 		B625CA971E093E8C00FCEC16 /* GYDataContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GYDataContext.m; sourceTree = "<group>"; };
 		B625CA981E093E8C00FCEC16 /* GYDBRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GYDBRunner.h; sourceTree = "<group>"; };
@@ -209,7 +208,6 @@
 				B625CAA91E093EBA00FCEC16 /* AndyDataCenter.h */,
 				B625CAAA1E093F0700FCEC16 /* NSObject+DataCenter.h */,
 				B625CAAB1E093F0700FCEC16 /* NSObject+DataCenter.m */,
-				B625CA951E093E8C00FCEC16 /* GYDataCenter.h */,
 				B625CA961E093E8C00FCEC16 /* GYDataContext.h */,
 				B625CA971E093E8C00FCEC16 /* GYDataContext.m */,
 				B625CA981E093E8C00FCEC16 /* GYDBRunner.h */,

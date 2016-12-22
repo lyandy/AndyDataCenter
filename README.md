@@ -13,7 +13,7 @@ __Use in pod:__  ```pod 'AndyDataCenter'```
 
 _**tips:**_
 
-Unlike GYDataCenter, AndyDataCenter use the invaded way to combine one model. Your model don't inherit any class of AndyDataCenter. So if you want to remove AndyDataCenter from your project, that's easy.
+Unlike GYDataCenter, AndyDataCenter use the uninvaded way to combine one model. Your model don't inherit any class of AndyDataCenter. So if you want to remove AndyDataCenter from your project, that's easy.
 
 ---
 

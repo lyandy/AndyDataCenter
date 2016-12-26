@@ -120,7 +120,7 @@ typedef NS_ENUM(NSInteger, GYSQLJoinType) {
  *
  */
 
-- (void)saveObject:(id<GYModelObjectProtocol>)object;
+- (void)saveObject:(id<GYModelObjectProtocol>)object success:(void (^)())success failure:(void (^)(id error))failure;
 
 /**
  *
@@ -134,7 +134,7 @@ typedef NS_ENUM(NSInteger, GYSQLJoinType) {
 
 - (void)deleteClass:(Class<GYModelObjectProtocol>)modelClass
               where:(NSString *)where
-          arguments:(NSArray *)arguments;
+          arguments:(NSArray *)arguments Success:(void (^)())success failure:(void (^)(id error))failure;
 
 /**
  *
@@ -151,7 +151,7 @@ typedef NS_ENUM(NSInteger, GYSQLJoinType) {
 - (void)updateClass:(Class<GYModelObjectProtocol>)modelClass
                 set:(NSDictionary *)set
               where:(NSString *)where
-          arguments:(NSArray *)arguments;
+          arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure;
 
 - (void)inTransaction:(dispatch_block_t)block
                dbName:(NSString *)dbName;

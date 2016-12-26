@@ -60,9 +60,13 @@
 + (NSNumber *)andy_db_aggregate:(NSString *)function where:(NSString *)where arguments:(NSArray *)arguments;
 
 - (void)andy_db_saveObject;
+- (void)andy_db_saveObjectSuccess:(void (^)())success failure:(void (^)(id error))failure;
+
 - (void)andy_db_saveArrayObjects;
+- (void)andy_db_saveArrayObjectsSuccess:(void (^)())success failure:(void (^)(id error))failure;
 
 - (void)andy_db_deleteObject;
+- (void)andy_db_deleteObjectSuccess:(void (^)())success failure:(void (^)(id error))failure;
 
 /**
  *
@@ -73,6 +77,7 @@
  */
 
 + (void)andy_db_deleteObjectsWhere:(NSString *)where arguments:(NSArray *)arguments;
++ (void)andy_db_deleteObjectsWhere:(NSString *)where arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure;
 
 /**
  *
@@ -81,6 +86,7 @@
  */
 
 - (instancetype)andy_db_updateObjectSet:(NSDictionary *)set;
+- (instancetype)andy_db_updateObjectSet:(NSDictionary *)set success:(void (^)())success failure:(void (^)(id error))failure;
 
 /**
  *
@@ -93,6 +99,7 @@
  */
 
 + (void)andy_db_updateObjectsSet:(NSDictionary *)set Where:(NSString *)where arguments:(NSArray *)arguments;
++ (void)andy_db_updateObjectsSet:(NSDictionary *)set Where:(NSString *)where arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure;
 
 
 @end

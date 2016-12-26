@@ -384,11 +384,20 @@ static const double kTransactionTimeInterval = 1;
     return nil;
 }
 
-- (void)saveObject:(id<GYModelObjectProtocol>)object {
+- (void)saveObject:(id<GYModelObjectProtocol>)object success:(void (^)())success failure:(void (^)(id error))failure {
     if (!object) {
         NSAssert(NO, @"object cannot be nil");
+        
+        if (failure)
+        {
+            id errorStr = @"Object cannot be nil";
+            failure(errorStr);
+        }
+        
         return;
     }
+    
+    __block BOOL isSuccess = NO;
     
     Class<GYModelObjectProtocol> modelClass = [object class];
     BOOL hasPrimaryKey = [self isPrimaryKeyProvidedWithObject:object];
@@ -406,13 +415,45 @@ static const double kTransactionTimeInterval = 1;
     if (!hasPrimaryKey) {
         [databaseInfo.databaseQueue syncInDatabase:^(FMDatabase *db) {
             [self recordWriteOperationForDatabaseInfo:databaseInfo];
-            [db executeUpdate:sql withArgumentsInArray:arguments];
+            isSuccess = [db executeUpdate:sql withArgumentsInArray:arguments];
             [(id)object setValue:@([db lastInsertRowId]) forKey:[modelClass andy_db_primaryKey]];
+            
+            if(isSuccess)
+            {
+                if (success)
+                {
+                    success();
+                }
+            }
+            else
+            {
+                if (failure)
+                {
+                    id error = [NSString stringWithFormat:@"fmdb sync executeUpdate failed. SQL: %@", sql];
+                    failure(error);
+                }
+            }
         }];
     } else {
         [databaseInfo.databaseQueue asyncInDatabase:^(FMDatabase *db) {
             [self recordWriteOperationForDatabaseInfo:databaseInfo];
-            [db executeUpdate:sql withArgumentsInArray:arguments];
+            isSuccess = [db executeUpdate:sql withArgumentsInArray:arguments];
+            
+            if(isSuccess)
+            {
+                if (success)
+                {
+                    success();
+                }
+            }
+            else
+            {
+                if (failure)
+                {
+                    id error = [NSString stringWithFormat:@"fmdb sync executeUpdate failed. SQL: %@", sql];
+                    failure(error);
+                }
+            }
         }];
     }
 }
@@ -517,7 +558,10 @@ static const double kTransactionTimeInterval = 1;
 
 - (void)deleteClass:(Class<GYModelObjectProtocol>)modelClass
               where:(NSString *)where
-          arguments:(NSArray *)arguments {
+          arguments:(NSArray *)arguments Success:(void (^)())success failure:(void (^)(id error))failure {
+    
+    __block BOOL isSuccess = NO;
+    
     GYDatabaseInfo *databaseInfo = [self databaseInfoForClass:modelClass];
     [databaseInfo.databaseQueue asyncInDatabase:^(FMDatabase *db) {
         NSString *sql = nil;
@@ -528,15 +572,44 @@ static const double kTransactionTimeInterval = 1;
         }
         
         [self recordWriteOperationForDatabaseInfo:databaseInfo];
-        [db executeUpdate:sql withArgumentsInArray:arguments];
+        isSuccess = [db executeUpdate:sql withArgumentsInArray:arguments];
+        
+        if (isSuccess)
+        {
+            if (success)
+            {
+                success();
+            }
+        }
+        else
+        {
+            
+            if (failure)
+            {
+                id error = [NSString stringWithFormat:@"fmdb async executeUpdate failed. SQL: %@", sql];
+                failure(error);
+            }
+        }
     }];
 }
 
 - (void)updateClass:(Class<GYModelObjectProtocol>)modelClass
                 set:(NSDictionary *)set
               where:(NSString *)where
-          arguments:(NSArray *)arguments {
+          arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure{
+    
     NSAssert([set count], @"DB Error: Argument 'set' should not be nil.");
+    
+    if (set.count == 0)
+    {
+        if (failure)
+        {
+            id error = @"DB Error: Argument 'set' should not be nil.";
+            failure(error);
+        }
+    }
+    
+    __block BOOL isSuccess = NO;
     
     GYDatabaseInfo *databaseInfo = [self databaseInfoForClass:modelClass];
     [databaseInfo.databaseQueue asyncInDatabase:^(FMDatabase *db) {
@@ -562,7 +635,23 @@ static const double kTransactionTimeInterval = 1;
         [values addObjectsFromArray:arguments];
         
         [self recordWriteOperationForDatabaseInfo:databaseInfo];
-        [db executeUpdate:sql withArgumentsInArray:values];
+        isSuccess =  [db executeUpdate:sql withArgumentsInArray:values];
+        
+        if (isSuccess)
+        {
+            if (success)
+            {
+                success();
+            }
+        }
+        else
+        {
+            if (failure)
+            {
+                id error = [NSString stringWithFormat:@"fmdb async executeUpdate failed. SQL: %@", sql];
+                failure(error);
+            }
+        }
     }];
 }
 

@@ -183,50 +183,113 @@
     return [[GYDataContext sharedInstance] aggregate:self function:function where:where arguments:arguments];
 }
 
-- (void)andy_db_saveObject {
-    [[GYDataContext sharedInstance] saveObject:self];
+- (void)andy_db_saveObject
+{
+    [self andy_db_saveObjectSuccess:nil failure:nil];
 }
+
+- (void)andy_db_saveObjectSuccess:(void (^)())success failure:(void (^)(id error))failure {
+    [[GYDataContext sharedInstance] saveObject:self success:success failure:failure];
+}
+
 
 - (void)andy_db_saveArrayObjects
 {
+    [self andy_db_saveObjectSuccess:nil failure:nil];
+}
+
+- (void)andy_db_saveArrayObjectsSuccess:(void (^)())success failure:(void (^)(id error))failure
+{
     if ([self isKindOfClass:[NSArray class]] || [self isKindOfClass:[NSMutableArray class]])
     {
+        __block NSMutableArray *failArrM = [NSMutableArray array];
+        
         if ([self isKindOfClass:[NSArray class]])
         {
             [((NSArray *)self) enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                [obj andy_db_saveObject];
+                [obj andy_db_saveObjectSuccess:nil failure:^(id error) {
+                    [failArrM addObject:obj];
+                }];
             }];
         }
         else if ([self isKindOfClass:[NSMutableArray class]])
         {
             NSArray *arr = [((NSMutableArray *)self) copy];
             [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                [obj andy_db_saveObject];
+                [obj andy_db_saveObjectSuccess:nil failure:^(id error) {
+                    [failArrM addObject:obj];
+                }];
             }];
+        }
+        
+        NSArray *failArr = [failArrM copy];
+        if (failArr.count == 0)
+        {
+            if (success)
+            {
+                success();
+            }
+        }
+        else
+        {
+            if (failure)
+            {
+                failure(failArr);
+            }
         }
     }
     else
     {
         NSAssert(NO, @"%s : should be called by an array", __func__);
+        
+        if (failure)
+        {
+            id error = [NSString stringWithFormat:@"%s : should be called by an object of array type", __func__];
+            failure(error);
+        }
     }
 }
 
-- (void)andy_db_deleteObject {
+
+- (void)andy_db_deleteObject
+{
+    [self andy_db_deleteObjectSuccess:nil failure:nil];
+}
+
+- (void)andy_db_deleteObjectSuccess:(void (^)())success failure:(void (^)(id error))failure {
     Class<GYModelObjectProtocol> modelClass = [self class];
-    [[GYDataContext sharedInstance] deleteObject:modelClass primaryKey:[self valueForKey:[modelClass andy_db_primaryKey]]];
+    [[GYDataContext sharedInstance] deleteObject:modelClass primaryKey:[self valueForKey:[modelClass andy_db_primaryKey]] success:(void (^)())success failure:(void (^)(id error))failure];
 }
 
-+ (void)andy_db_deleteObjectsWhere:(NSString *)where arguments:(NSArray *)arguments {
-    [[GYDataContext sharedInstance] deleteObjects:self where:where arguments:arguments];
+
++ (void)andy_db_deleteObjectsWhere:(NSString *)where arguments:(NSArray *)arguments
+{
+    [self andy_db_deleteObjectsWhere:where arguments:arguments success:nil failure:nil];
 }
 
-- (instancetype)andy_db_updateObjectSet:(NSDictionary *)set {
++ (void)andy_db_deleteObjectsWhere:(NSString *)where arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure {
+    [[GYDataContext sharedInstance] deleteObjects:self where:where arguments:arguments success:(void (^)())success failure:(void (^)(id error))failure];
+}
+
+
+- (instancetype)andy_db_updateObjectSet:(NSDictionary *)set
+{
+    return [self andy_db_updateObjectSet:set success:nil failure:nil];
+}
+
+- (instancetype)andy_db_updateObjectSet:(NSDictionary *)set success:(void (^)())success failure:(void (^)(id error))failure {
     Class<GYModelObjectProtocol> modelClass = [self class];
-    return [[GYDataContext sharedInstance] updateAndReturnObject:modelClass set:set primaryKey:[self valueForKey:[modelClass andy_db_primaryKey]]];
+    return [[GYDataContext sharedInstance] updateAndReturnObject:modelClass set:set primaryKey:[self valueForKey:[modelClass andy_db_primaryKey]] success:(void (^)())success failure:(void (^)(id error))failure];
 }
 
-+ (void)andy_db_updateObjectsSet:(NSDictionary *)set Where:(NSString *)where arguments:(NSArray *)arguments {
-    [[GYDataContext sharedInstance] updateObjects:self set:set where:where arguments:arguments];
+
++ (void)andy_db_updateObjectsSet:(NSDictionary *)set Where:(NSString *)where arguments:(NSArray *)arguments
+{
+    [self andy_db_updateObjectsSet:set Where:where arguments:arguments success:nil failure:nil];
+}
+
++ (void)andy_db_updateObjectsSet:(NSDictionary *)set Where:(NSString *)where arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure {
+    [[GYDataContext sharedInstance] updateObjects:self set:set where:where arguments:arguments success:(void (^)())success failure:(void (^)(id error))failure];
 }
 
 

@@ -123,10 +123,10 @@
  *
  */
 
-- (void)saveObject:(id<GYModelObjectProtocol>)object;
+- (void)saveObject:(id<GYModelObjectProtocol>)object success:(void (^)())success failure:(void (^)(id error))failure;
 
 - (void)deleteObject:(Class<GYModelObjectProtocol>)modelClass
-          primaryKey:(id)primartyKey;
+          primaryKey:(id)primartyKey success:(void (^)())success failure:(void (^)(id error))failure;
 
 /**
  *
@@ -140,7 +140,7 @@
 
 - (void)deleteObjects:(Class<GYModelObjectProtocol>)modelClass
                 where:(NSString *)where
-            arguments:(NSArray *)arguments;
+            arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure;
 
 /**
  *
@@ -170,7 +170,7 @@
 
 - (id)updateAndReturnObject:(Class<GYModelObjectProtocol>)modelClass
                         set:(NSDictionary *)set
-                 primaryKey:(id)primaryKey;
+                 primaryKey:(id)primaryKey success:(void (^)())success failure:(void (^)(id error))failure;
 
 /**
  *
@@ -187,7 +187,7 @@
 - (void)updateObjects:(Class<GYModelObjectProtocol>)modelClass
                   set:(NSDictionary *)set
                 where:(NSString *)where
-            arguments:(NSArray *)arguments;
+            arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure;
 
 - (void)inTransaction:(dispatch_block_t)block
                dbName:(NSString *)dbName;

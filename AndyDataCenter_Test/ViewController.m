@@ -13,6 +13,8 @@
 #import "School.h"
 #import "Road.h"
 
+#import <sys/stat.h>
+
 @interface ViewController ()
 
 @end
@@ -32,6 +34,15 @@
         [[NSFileManager defaultManager] removeItemAtPath:dbPath error:nil];
         [[NSFileManager defaultManager] copyItemAtPath:srcPath toPath:dbPath error:nil];
     }
+    
+//    struct stat statbuf;
+//    const char *cpath = [dbPath fileSystemRepresentation];
+//    if (cpath && stat(cpath, &statbuf) == 0) {
+//        NSNumber *fileSize = [NSNumber numberWithUnsignedLongLong:statbuf.st_size];
+//        NSDate *modificationDate = [NSDate dateWithTimeIntervalSince1970:statbuf.st_mtime];
+//        NSDate *creationDate = [NSDate dateWithTimeIntervalSince1970:statbuf.st_ctime];
+//        // etc
+//    }
 }
 
 - (IBAction)btnSaveSingleClick:(UIButton *)sender
@@ -76,14 +87,27 @@
     
     sch1.persons = @[p1, p2, p3];
     
-    [sch1 andy_db_saveObject];
+    [sch1 andy_db_saveObjectSuccess:^{
+
+        NSLog(@"成功了");
+    } failure:^(id error) {
+        
+    }];
     
     [sch1.persons enumerateObjectsUsingBlock:^(Person * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         obj.parentId = sch1.Id;
-        [obj andy_db_saveObject];
+        [obj andy_db_saveObjectSuccess:^{
+            
+        } failure:^(id error) {
+            
+        }];
         
         obj.toy.parentId = obj.Id;
-        [obj.toy andy_db_saveObject];
+        [obj.toy andy_db_saveObjectSuccess:^{
+            
+        } failure:^(id error) {
+            
+        }];
         
     }];
 }
@@ -104,7 +128,11 @@
     
     NSArray *rArr = @[r1, r2, r3];
     
-    [rArr andy_db_saveArrayObjects];
+    [rArr andy_db_saveArrayObjectsSuccess:^{
+        NSLog(@"成功了");
+    } failure:^(id error) {
+        //如果失败的话，则返回失败的对象组成的数组
+    }];
 }
 
 - (IBAction)btnDeleteSingleClick:(UIButton *)sender
@@ -118,13 +146,17 @@
     Road *r = [Road andy_db_objectForId:@"京0001"];
     if (r != nil)
     {
-        [r andy_db_deleteObject];
-        
-        NSArray *rArr = [Road andy_db_objectsWhere:nil arguments:nil];
-        
-        [rArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSLog(@"%@", obj);
+        [r andy_db_deleteObjectSuccess:^{
+            NSLog(@"删除成功");
+        } failure:^(id error) {
+            NSLog(@"删除失败");
         }];
+        
+//        NSArray *rArr = [Road andy_db_objectsWhere:nil arguments:nil];
+//        
+//        [rArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+//            NSLog(@"%@", obj);
+//        }];
     }
 }
 
@@ -132,7 +164,11 @@
 {
     //[Road andy_db_deleteObjectsWhere:@"where name = ?" arguments:@[@"北苑路"]];
     
-    [Road andy_db_deleteObjectsWhere:@"where name like '%北%'" arguments:nil];
+    [Road andy_db_deleteObjectsWhere:@"where name like '%北%'" arguments:nil success:^{
+        NSLog(@"删除成功");
+    } failure:^(id error) {
+        NSLog(@"删除失败");
+    }];
 }
 
 - (IBAction)btnSelectSingleClick:(UIButton *)sender
@@ -176,14 +212,24 @@
 {
     NSArray *pArr = [Person andy_db_objectsWhere:@"where name = ?" arguments:@[@"李扬"]];
 
-    Person *pChange = [pArr.firstObject andy_db_updateObjectSet:@{@"name" : @"测试"}];
+    Person *pChange = [pArr.firstObject andy_db_updateObjectSet:@{@"name" : @"测试"} success:^{
+        NSLog(@"成功了");
+    } failure:^(id error) {
+        NSLog(@"失败了");
+    }];
     
     NSLog(@"%@", pChange.name);
 }
 
 - (IBAction)btnUpdateMultiplyClick:(UIButton *)sender
 {
-    [Person andy_db_updateObjectsSet:@{@"age" : @"40"} Where:@"where name = ?" arguments:@[@"测试"]];
+    //[Person andy_db_updateObjectsSet:@{@"age" : @"40"} Where:@"where name = ?" arguments:@[@"测试"] ];
+    
+    [Person andy_db_updateObjectsSet:@{@"age" : @"40"} Where:@"where name = ?" arguments:@[@"测试"] success:^{
+        NSLog(@"成功了");
+    } failure:^(id error) {
+        NSLog(@"失败了");
+    }];
     
 //    [Person andy_db_updateObjectsSet:@{@"age" : @"40"} Where:nil arguments:nil];
 }

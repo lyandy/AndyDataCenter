@@ -233,9 +233,16 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
     return result;
 }
 
-- (void)saveObject:(id<GYModelObjectProtocol>)object {
+- (void)saveObject:(id<GYModelObjectProtocol>)object success:(void (^)())success failure:(void (^)(id error))failure {
     if (!object) {
         NSAssert(NO, @"Object cannot be nil");
+        
+        if (failure)
+        {
+            id error = @"Object cannot be nil";
+            failure(error);
+        }
+        
         return;
     }
     
@@ -248,21 +255,30 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
         }
         
         [(id)object setValue:@YES forKey:@"saving"];
-        [_dbRunner saveObject:object];
+        
         NSMutableDictionary *cache = [self tableCacheFromDBCache:queue.cache class:modelClass];
         if (cache) {
             [cache setObject:object forKey:[(id)object valueForKey:[modelClass andy_db_primaryKey]]];
         }
+        
+        [_dbRunner saveObject:object success:success failure:failure];
         
         [(id)object setValue:@NO forKey:@"saving"];
     }];
 }
 
 - (void)deleteObject:(Class<GYModelObjectProtocol>)modelClass
-          primaryKey:(id)primaryKey {
+          primaryKey:(id)primaryKey success:(void (^)())success failure:(void (^)(id error))failure {
     NSAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
     if (!primaryKey) {
         NSAssert(NO, @"primaryKey cannot be nil");
+        
+        if (failure)
+        {
+            id error = @"primaryKey cannot be nil";
+            failure(error);
+        }
+        
         return;
     }
     
@@ -279,13 +295,13 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
         NSString *where = [self whereIdSqlForClass:modelClass];
         [_dbRunner deleteClass:modelClass
                          where:where
-                     arguments:@[ primaryKey ]];
+                     arguments:@[ primaryKey ] Success:(void (^)())success failure:(void (^)(id error))failure];
     }];
 }
 
 - (void)deleteObjects:(Class<GYModelObjectProtocol>)modelClass
                 where:(NSString *)where
-            arguments:(NSArray *)arguments {
+            arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure {
     GYDataContextQueue *queue = [self queueForDBName:[modelClass andy_db_dbName]];
     
     [queue dispatchAsync:^{
@@ -301,7 +317,7 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
             }
         }
         
-        [_dbRunner deleteClass:modelClass where:where arguments:arguments];
+        [_dbRunner deleteClass:modelClass where:where arguments:arguments Success:success failure:failure];
     }];
 }
 
@@ -321,16 +337,23 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
         [cache removeObjectForKey:primaryKey];
         
         NSString *where = [self whereIdSqlForClass:modelClass];
-        [_dbRunner updateClass:modelClass set:set where:where arguments:@[ primaryKey ]];
+        [_dbRunner updateClass:modelClass set:set where:where arguments:@[ primaryKey ] success:nil failure:nil];
     }];
 }
 
 - (id)updateAndReturnObject:(Class<GYModelObjectProtocol>)modelClass
                         set:(NSDictionary *)set
-                 primaryKey:(id)primaryKey {
+                 primaryKey:(id)primaryKey success:(void (^)())success failure:(void (^)(id error))failure {
     NSAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
     if (!primaryKey) {
         NSAssert(NO, @"primaryKey cannot be nil");
+        
+        if (failure)
+        {
+            id error = @"primaryKey cannot be nil";
+            failure(error);
+        }
+        
         return nil;
     }
     
@@ -354,7 +377,7 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
         
         NSString *where = [self whereIdSqlForClass:modelClass];
         NSArray *arguments = @[ primaryKey ];
-        [_dbRunner updateClass:modelClass set:set where:where arguments:arguments];
+        [_dbRunner updateClass:modelClass set:set where:where arguments:arguments success:success failure:failure];
         
         if (!result) {
             result = [_dbRunner objectsOfClass:modelClass properties:nil where:where arguments:arguments].firstObject;
@@ -369,7 +392,7 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 - (void)updateObjects:(Class<GYModelObjectProtocol>)modelClass
                   set:(NSDictionary *)set
                 where:(NSString *)where
-            arguments:(NSArray *)arguments {
+            arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure {
     GYDataContextQueue *queue = [self queueForDBName:[modelClass andy_db_dbName]];
     
     [queue dispatchAsync:^{
@@ -390,19 +413,8 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
             }
         }
         
-        [_dbRunner updateClass:modelClass set:set where:simplifiedWhere arguments:simplifiedArguments];
+        [_dbRunner updateClass:modelClass set:set where:simplifiedWhere arguments:simplifiedArguments success:success failure:failure];
     }];
-}
-
-- (void)saveRelationshipsForClass:(Class)modelClass
-                            inSet:(NSDictionary *)set {
-    NSDictionary *propertyTypes = [modelClass andy_db_propertyTypes];
-    for (NSString *property in set.allKeys) {
-        GYPropertyType propertyType = [[propertyTypes objectForKey:property] unsignedIntegerValue];
-        if (propertyType == GYPropertyTypeRelationship) {
-            [self saveObject:[set objectForKey:property]];
-        }
-    }
 }
 
 - (void)inTransaction:(dispatch_block_t)block

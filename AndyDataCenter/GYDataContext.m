@@ -366,11 +366,25 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
         if (result) {
             result = [result copy];
             for (NSString *key in set) {
-                id value = [set objectForKey:key];
+                
+                NSString *tmpKey = key;
+
+                NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+                if (replacedKeyDict != nil)
+                {
+                    //找到已经被替换成了其他成员名称
+                    NSString *replacedKey = [[replacedKeyDict allKeysForObject:key] firstObject];
+                    if (replacedKey != nil)
+                    {
+                        tmpKey = replacedKey;
+                    }
+                }
+                
+                id value = [set objectForKey:tmpKey];
                 if (value == [NSNull null]) {
-                    [result setValue:nil forKey:key];
+                    [result setValue:nil forKey:tmpKey];
                 } else {
-                    [result setValue:value forKey:key];
+                    [result setValue:value forKey:tmpKey];
                 }
             }
         }
@@ -525,7 +539,7 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
     NSString *sql = objc_getAssociatedObject(modelClass, kWhereIdSqlKey);
     
     if (!sql) {
-        sql = [[NSString alloc] initWithFormat:@"WHERE %@=?", [GYDCUtilities columnForClass:modelClass property:[modelClass andy_db_primaryKey]]];
+        sql = [[NSString alloc] initWithFormat:@"WHERE %@ = ?", [GYDCUtilities columnForClass:modelClass property:[modelClass andy_db_primaryKey]]];
         objc_setAssociatedObject(modelClass, kWhereIdSqlKey, sql, OBJC_ASSOCIATION_COPY_NONATOMIC);
     }
     

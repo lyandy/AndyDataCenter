@@ -12,25 +12,21 @@
 @interface NSObject (DataCenter)<GYModelObjectProtocol, NSCopying>
 
 /**
- *
- * @param primaryKey Primary key value of the model object that you want to fetch.
- *
- * @return Object that match the primary key value, or nil if none is found.
- *
- */
+ 根据主键查询数据Model。注意 参数 表字段名称或Model属性名称 大小写
 
+ @param primaryKey 主键
+ @return 返回查询到的Model
+ */
 + (instancetype)andy_db_objectForId:(id)primaryKey;
 
-/**
- *
- * @param where Where clause of SQL. Use '?'s as placeholders for arguments.
- *
- * @param arguments Values to bind to the where clause.
- *
- * @return Objects that match the condition of the where clause.
- *
- */
 
+/**
+ 根据条件查询到数据Model组成的数组。注意 参数 表字段名称或Model属性名称 大小写
+
+ @param where 查询条件
+ @param arguments 查询参数
+ @return 返回查询到的Model组成的数组
+ */
 + (NSArray *)andy_db_objectsWhere:(NSString *)where arguments:(NSArray *)arguments;
 
 /**

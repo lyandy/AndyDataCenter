@@ -103,6 +103,9 @@
     if ([modelClass andy_db_fts] && [property isEqualToString:[modelClass andy_db_primaryKey]]) {
         return @"docid";
     }
+    
+    
+    
     return property;
 }
 

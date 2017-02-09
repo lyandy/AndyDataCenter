@@ -10,8 +10,12 @@
 
 @interface Road : NSObject
 
+@property (nonatomic, assign) NSInteger Id;
+
 @property (nonatomic, copy) NSString *no;
 
 @property (nonatomic, copy) NSString *name;
+
+@property (nonatomic, copy) NSString *provin;
 
 @end

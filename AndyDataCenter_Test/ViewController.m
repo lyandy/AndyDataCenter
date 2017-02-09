@@ -23,7 +23,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths firstObject];
     NSString *dbPath = [documentsDirectory stringByAppendingPathComponent:[[Person andy_db_dbName] stringByAppendingPathExtension:@"db"]];
@@ -48,13 +48,14 @@
 - (IBAction)btnSaveSingleClick:(UIButton *)sender
 {
     School *sch1 = [[School alloc] init];
+
     sch1.Id = @"sch1";
     sch1.name = @"山东科技大学";
     
     
     Toy *t1 = [[Toy alloc] init];
     t1.no = @"t1";
-    t1.name = @"小狗";
+    t1.toyName = @"小狗";
     t1.price = 13.32;
     
     Person *p1 = [[Person alloc] init];
@@ -65,7 +66,7 @@
     
     Toy *t2 = [[Toy alloc] init];
     t2.no = @"t2";
-    t2.name = @"小猫";
+    t2.toyName = @"小猫";
     t2.price = 25.56;
     
     Person *p2 = [[Person alloc] init];
@@ -76,7 +77,7 @@
     
     Toy *t3 = [[Toy alloc] init];
     t3.no = @"t3";
-    t3.name = @"大驴子";
+    t3.toyName = @"大驴子";
     t3.price = 25.56;
     
     Person *p3 = [[Person alloc] init];
@@ -115,15 +116,20 @@
 - (IBAction)btnSaveMultiplyClick:(UIButton *)sender
 {
     Road *r1 = [[Road alloc] init];
+    r1.Id = 1111;
     r1.no = @"京0001";
     r1.name = @"北苑路";
+    r1.provin = @"北京市";
     
     Road *r2 = [[Road alloc] init];
-    r2.no = @"京0002";
-    r2.name = @"北苑路";
+    r2.Id = 2222;
+    r2.no = @"津0002";
+    r2.name = @"北苑路2";
+    r2.provin = @"天津市";
     
     Road *r3 = [[Road alloc] init];
-    r3.no = @"京0003";
+    r3.Id = 3333;
+    r3.no = @"鲁0003";
     r3.name = @"红军营南路";
     
     NSArray *rArr = @[r1, r2, r3];
@@ -133,6 +139,12 @@
     } failure:^(id error) {
         //如果失败的话，则返回失败的对象组成的数组
     }];
+    
+//    [r1 andy_db_saveObjectSuccess:^{
+//        NSLog(@"成功了");
+//    } failure:^(id error) {
+//        
+//    }];
 }
 
 - (IBAction)btnDeleteSingleClick:(UIButton *)sender
@@ -143,7 +155,7 @@
 //    
 //    [r4 andy_db_saveObject];
     
-    Road *r = [Road andy_db_objectForId:@"京0001"];
+    Road *r = [Road andy_db_objectForId:@"1111"];
     if (r != nil)
     {
         [r andy_db_deleteObjectSuccess:^{
@@ -175,15 +187,15 @@
 {
     Toy *t = [Toy andy_db_objectForId:@"t1"];
     
-    NSLog(@"%@", t.name);
+    NSLog(@"%@", t.toyName);
 }
 
 - (IBAction)btnSelectMultiplyClick:(UIButton *)sender
 {
-//    NSArray<Person *> *pArr = [Person andy_db_objectsWhere:@"where parentId = ?" arguments:@[@"sch1"]];
-    NSArray *pArr = [Person andy_db_objectsWhere:nil arguments:nil];
+    NSArray<Toy *> *arr = [Toy andy_db_objectsWhere:@"where name = ?" arguments:@[@"小猫"]];
+//    NSArray<Person *> *arr = [Person andy_db_objectsWhere:nil arguments:nil];
     
-    [pArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSLog(@"%@", obj);
     }];
 }
@@ -192,7 +204,7 @@
 {
 //    NSArray *pArr = [Person andy_db_idsWhere:@"where parentId = ?" arguments:@[@"sch1"]];
     
-    NSArray *pArr = [Person andy_db_idsWhere:nil arguments:nil];
+    NSArray *pArr = [Road andy_db_idsWhere:@"where name = ?" arguments:@[@"北苑路"]];
     
     [pArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSLog(@"%@", obj);
@@ -201,7 +213,7 @@
 
 - (IBAction)btnSelectLikeClick:(UIButton *)sender
 {
-    NSArray *rArr = [Road andy_db_objectsWhere:@"where no like '%00%'" arguments:nil];
+    NSArray *rArr = [Road andy_db_objectsWhere:@"where address like '%2%'" arguments:nil];
     
     [rArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSLog(@"%@", obj);
@@ -210,9 +222,9 @@
 
 - (IBAction)btnUpdateSingleClick:(UIButton *)sender
 {
-    NSArray *pArr = [Person andy_db_objectsWhere:@"where name = ?" arguments:@[@"李扬"]];
+    NSArray *pArr = [Person andy_db_objectsWhere:@"where nickName = ?" arguments:@[@"李扬"]];
 
-    Person *pChange = [pArr.firstObject andy_db_updateObjectSet:@{@"name" : @"测试"} success:^{
+    Person *pChange = [pArr.firstObject andy_db_updateObjectSet:@{@"nickName" : @"测试haha"} success:^{
         NSLog(@"成功了");
     } failure:^(id error) {
         NSLog(@"失败了");
@@ -225,8 +237,10 @@
 {
     //[Person andy_db_updateObjectsSet:@{@"age" : @"40"} Where:@"where name = ?" arguments:@[@"测试"] ];
     
-    [Person andy_db_updateObjectsSet:@{@"age" : @"40"} Where:@"where name = ?" arguments:@[@"测试"] success:^{
+    [Person andy_db_updateObjectsSet:@{@"myAge" : @"30"} Where:@"where nickName like '%测试%'" arguments:nil success:^{
         NSLog(@"成功了");
+        
+        NSLog(@"%@", [NSThread currentThread]);
     } failure:^(id error) {
         NSLog(@"失败了");
     }];
@@ -240,7 +254,7 @@
     
     NSLog(@"%zd", [num integerValue]);
     
-    NSNumber *sum = [Person andy_db_aggregate:@"sum(age)" where:@"where age < ? " arguments:@[@"30"]];
+    NSNumber *sum = [Person andy_db_aggregate:@"sum(age)" where:@"where age < ? " arguments:@[@"100"]];
     
     NSLog(@"%lf", [sum floatValue]);
 }

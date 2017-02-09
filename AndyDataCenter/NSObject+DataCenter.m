@@ -105,6 +105,11 @@
     return nil;
 }
 
++ (NSDictionary *)andy_db_replacedKeyFromPropertyName
+{
+    return nil;
+}
+
 + (NSDictionary *)andy_db_propertyTypes {
     static const void * const kPropertyTypesKey = &kPropertyTypesKey;
     NSDictionary *result = objc_getAssociatedObject(self, kPropertyTypesKey);
@@ -200,27 +205,28 @@
 
 - (void)andy_db_saveArrayObjectsSuccess:(void (^)())success failure:(void (^)(id error))failure
 {
-    if ([self isKindOfClass:[NSArray class]] || [self isKindOfClass:[NSMutableArray class]])
+    if ([self isKindOfClass:[NSArray class]])
     {
         __block NSMutableArray *failArrM = [NSMutableArray array];
         
-        if ([self isKindOfClass:[NSArray class]])
-        {
-            [((NSArray *)self) enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                [obj andy_db_saveObjectSuccess:nil failure:^(id error) {
-                    [failArrM addObject:obj];
-                }];
+        //参考：http://stackoverflow.com/questions/22914753/wait-for-async-task-to-finish-completion-block-before-returning-in-app-delegate
+        // http://stackoverflow.com/questions/11909629/waiting-until-two-async-blocks-are-executed-before-starting-another-block
+        // http://stackoverflow.com/questions/4326350/how-do-i-wait-for-an-asynchronously-dispatched-block-to-finish
+        // http://www.jianshu.com/p/7391ff7d343f
+        // 这里处理这个 多个 Async Block 回调然后再执行的问题，要用group。semaphore针对单个任务信号可用
+        dispatch_group_t group = dispatch_group_create();
+        
+        [((NSArray *)self) enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            dispatch_group_enter(group);
+            [obj andy_db_saveObjectSuccess:^{
+                dispatch_group_leave(group);
+            }failure:^(id error) {
+                [failArrM addObject:obj];
+                dispatch_group_leave(group);
             }];
-        }
-        else if ([self isKindOfClass:[NSMutableArray class]])
-        {
-            NSArray *arr = [((NSMutableArray *)self) copy];
-            [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                [obj andy_db_saveObjectSuccess:nil failure:^(id error) {
-                    [failArrM addObject:obj];
-                }];
-            }];
-        }
+        }];
+        
+        dispatch_group_wait(group,  DISPATCH_TIME_FOREVER);
         
         NSArray *failArr = [failArrM copy];
         if (failArr.count == 0)

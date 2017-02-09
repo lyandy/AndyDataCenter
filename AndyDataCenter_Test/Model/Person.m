@@ -23,6 +23,11 @@
     return @"Id";
 }
 
++ (NSDictionary *)andy_db_replacedKeyFromPropertyName
+{
+    return @{@"Id" : @"pId", @"name" : @"nickName", @"age" : @"myAge"};
+}
+
 + (NSArray *)andy_db_persistentProperties {
     static NSArray *properties = nil;
     static dispatch_once_t onceToken;

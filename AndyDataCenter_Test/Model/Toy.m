@@ -23,13 +23,18 @@
     return @"no";
 }
 
++ (NSDictionary *)andy_db_replacedKeyFromPropertyName
+{
+    return @{@"toyName" : @"name"};
+}
+
 + (NSArray *)andy_db_persistentProperties {
     static NSArray *properties = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         properties = @[
                        @"no",
-                       @"name",
+                       @"toyName",
                        @"price",
                        @"parentId"
                        ];

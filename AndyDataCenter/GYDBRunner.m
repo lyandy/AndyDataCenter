@@ -102,8 +102,26 @@ static const double kTransactionTimeInterval = 1;
     
     NSMutableString *sql = [[NSMutableString alloc] initWithFormat:@"SELECT %@ FROM %@", columnSql, [modelClass andy_db_tableName]];
     if (where) {
-        [sql appendFormat:@" %@", where];
+        NSArray<NSString *> * strArr = [where componentsSeparatedByString:@" "];
+        for (NSString * str in strArr)
+        {
+            NSString *tmpStr = str;
+            
+            NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+            if (replacedKeyDict != nil)
+            {
+                //找到已经被替换成了其他成员名称
+                NSString *replacedKey = replacedKeyDict[str];
+                if (replacedKey != nil)
+                {
+                    tmpStr = replacedKey;
+                }
+            }
+            
+            [sql appendFormat:@" %@", tmpStr];
+        }
     }
+
     
     NSUInteger length = properties.count;
     if (!length) {
@@ -158,8 +176,26 @@ static const double kTransactionTimeInterval = 1;
     
     NSMutableString *sql = [[NSMutableString alloc] initWithFormat:@"SELECT %@ FROM %@ %@ %@ ON %@", columnSql, [leftClass andy_db_tableName], join, [rightClass andy_db_tableName], joinCondition];
     if (where) {
-        [sql appendFormat:@" %@", where];
+        NSArray<NSString *> * strArr = [where componentsSeparatedByString:@" "];
+        for (NSString * str in strArr)
+        {
+            NSString *tmpStr = str;
+            
+            NSDictionary *replacedKeyDict = [leftClass andy_db_replacedKeyFromPropertyName];
+            if (replacedKeyDict != nil)
+            {
+                //找到已经被替换成了其他成员名称
+                NSString *replacedKey = replacedKeyDict[str];
+                if (replacedKey != nil)
+                {
+                    tmpStr = replacedKey;
+                }
+            }
+            
+            [sql appendFormat:@" %@", tmpStr];
+        }
     }
+
     
     NSMutableArray *leftObjects = [[NSMutableArray alloc] init];
     NSMutableArray *rightObjects = [[NSMutableArray alloc] init];
@@ -227,6 +263,17 @@ static const double kTransactionTimeInterval = 1;
             [properties addObject:[GYDCUtilities propertyForClass:modelClass column:column]];
         }
         NSString *property = [properties objectAtIndex:index];
+        
+        NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+        if (replacedKeyDict != nil)
+        {
+            //找到已经被替换成了其他成员名称
+            NSString *replacedKey = [[replacedKeyDict allKeysForObject:property] firstObject];
+            if (replacedKey != nil)
+            {
+                property = replacedKey;
+            }
+        }
         
         if (index == 0 && [property isEqualToString:[modelClass andy_db_primaryKey]]) {
             id value = [self valueForClass:modelClass property:property resultSet:resultSet index:(int)i];
@@ -342,16 +389,47 @@ static const double kTransactionTimeInterval = 1;
     NSMutableArray *ids = [[NSMutableArray alloc] init];
     
     NSString *primaryKeyColumn = [GYDCUtilities columnForClass:modelClass property:[modelClass andy_db_primaryKey]];
-    NSMutableString *sql = [[NSMutableString alloc] initWithFormat:@"SELECT %@ FROM %@", primaryKeyColumn, [modelClass andy_db_tableName]];
+    
+    NSString *tmpColumn = primaryKeyColumn;
+    
+    NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+    if (replacedKeyDict != nil)
+    {
+        //找到已经被替换成了其他成员名称
+        NSString *replacedKey = replacedKeyDict[primaryKeyColumn];
+        if (replacedKey != nil)
+        {
+            tmpColumn = replacedKey;
+        }
+    }
+    
+    NSMutableString *sql = [[NSMutableString alloc] initWithFormat:@"SELECT %@ FROM %@", tmpColumn, [modelClass andy_db_tableName]];
     if (where) {
-        [sql appendFormat:@" %@", where];
+        NSArray<NSString *> * strArr = [where componentsSeparatedByString:@" "];
+        for (NSString * str in strArr)
+        {
+            NSString *tmpStr = str;
+            
+            NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+            if (replacedKeyDict != nil)
+            {
+                //找到已经被替换成了其他成员名称
+                NSString *replacedKey = replacedKeyDict[str];
+                if (replacedKey != nil)
+                {
+                    tmpStr = replacedKey;
+                }
+            }
+            
+            [sql appendFormat:@" %@", tmpStr];
+        }
     }
     
     GYDatabaseInfo *databaseInfo = [self databaseInfoForClass:modelClass];
     [databaseInfo.databaseQueue syncInDatabase:^(FMDatabase *db) {
         FMResultSet *resultSet = [db executeQuery:sql withArgumentsInArray:arguments];
         while ([resultSet next]) {
-            id objectId = [resultSet objectForColumnName:primaryKeyColumn];
+            id objectId = [resultSet objectForColumnName:tmpColumn];
             [ids addObject:objectId];
         }
     }];
@@ -365,9 +443,50 @@ static const double kTransactionTimeInterval = 1;
                      arguments:(NSArray *)arguments {
     __block NSNumber *result = nil;
     
+    NSUInteger leftIndex = [function rangeOfString:@"("].location;
+    NSUInteger rightIndex = [function rangeOfString:@")"].location;
+    NSString *replacedColumn = [function substringWithRange:(NSRange){leftIndex + 1, rightIndex - leftIndex - 1}];
+    
+    NSString *tmpColumn = nil;
+    NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+    if (replacedKeyDict != nil)
+    {
+        //找到已经被替换成了其他成员名称
+        NSString *replacedKey = replacedKeyDict[replacedColumn];
+        if (replacedKey != nil)
+        {
+            tmpColumn = replacedKey;
+        }
+    }
+
+    if (tmpColumn != nil)
+    {
+        function = [function stringByReplacingOccurrencesOfString:replacedColumn withString:tmpColumn];
+    }
+    
+//    NSRange range = NSMakeRange(begin, end - begin);
+//    return [self substringWithRange:range];
+    
     NSMutableString *sql = [[NSMutableString alloc] initWithFormat:@"SELECT %@ FROM %@", function, [modelClass andy_db_tableName]];
     if (where) {
-        [sql appendFormat:@" %@", where];
+        NSArray<NSString *> * strArr = [where componentsSeparatedByString:@" "];
+        for (NSString * str in strArr)
+        {
+            NSString *tmpStr = str;
+            
+            NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+            if (replacedKeyDict != nil)
+            {
+                //找到已经被替换成了其他成员名称
+                NSString *replacedKey = replacedKeyDict[str];
+                if (replacedKey != nil)
+                {
+                    tmpStr = replacedKey;
+                }
+            }
+            
+            [sql appendFormat:@" %@", tmpStr];
+        }
     }
     
     GYDatabaseInfo *databaseInfo = [self databaseInfoForClass:modelClass];
@@ -477,7 +596,21 @@ static const double kTransactionTimeInterval = 1;
         NSMutableArray *columns = [[NSMutableArray alloc] init];
         NSMutableArray *questionMarks = [[NSMutableArray alloc] init];
         for (NSString *property in *properties) {
-            [columns addObject:[GYDCUtilities columnForClass:modelClass property:property]];
+            
+            NSString *tmpProperty = property;
+            
+            NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+            if (replacedKeyDict != nil)
+            {
+                //找到已经被替换成了其他成员名称
+                NSString *replacedKey = replacedKeyDict[property];
+                if (replacedKey != nil)
+                {
+                    tmpProperty = replacedKey;
+                }
+            }
+            
+            [columns addObject:[GYDCUtilities columnForClass:modelClass property:tmpProperty]];
             [questionMarks addObject:@"?"];
         }
         
@@ -565,8 +698,31 @@ static const double kTransactionTimeInterval = 1;
     GYDatabaseInfo *databaseInfo = [self databaseInfoForClass:modelClass];
     [databaseInfo.databaseQueue asyncInDatabase:^(FMDatabase *db) {
         NSString *sql = nil;
-        if (where) {
-            sql = [NSString stringWithFormat:@"DELETE FROM %@ %@", [modelClass andy_db_tableName], where];
+        NSMutableString *whereStrM = [NSMutableString string];
+        if (where)
+        {
+            NSArray<NSString *> * strArr = [where componentsSeparatedByString:@" "];
+            
+            for (NSString * str in strArr)
+            {
+                NSString *tmpStr = str;
+                
+                NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+                if (replacedKeyDict != nil)
+                {
+                    //找到已经被替换成了其他成员名称
+                    NSString *replacedKey = replacedKeyDict[str];
+                    if (replacedKey != nil)
+                    {
+                        tmpStr = replacedKey;
+                    }
+                }
+                
+                [whereStrM appendFormat:@" %@", tmpStr];
+            }
+        }
+        if (whereStrM){
+            sql = [NSString stringWithFormat:@"DELETE FROM %@ %@", [modelClass andy_db_tableName], whereStrM];
         } else {
             sql = [NSString stringWithFormat:@"DELETE FROM %@", [modelClass andy_db_tableName]];
         }
@@ -623,15 +779,68 @@ static const double kTransactionTimeInterval = 1;
                 [setSql appendString:@","];
             }
             NSString *key = [allKeys objectAtIndex:i];
-            [setSql appendFormat:@"%@=?", [GYDCUtilities columnForClass:modelClass property:key]];
-            [(id)modelObject setValue:[set objectForKey:key] forKey:key];
-            [values addObject:[self valueOfProperty:key ofObject:modelObject]];
+
+            [setSql appendFormat:@" %@ = ? ", [GYDCUtilities columnForClass:modelClass property:key]];
+            
+            NSString *tmpKey = key;
+            
+            NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+            if (replacedKeyDict != nil)
+            {
+                //找到已经被替换成了其他成员名称
+                NSString *replacedKey = [[replacedKeyDict allKeysForObject:key] firstObject];
+                if (replacedKey != nil)
+                {
+                    tmpKey = replacedKey;
+                }
+            }
+            
+            [(id)modelObject setValue:[set objectForKey:key] forKey:tmpKey];
+            [values addObject:[self valueOfProperty:tmpKey ofObject:modelObject]];
         }
         
-        NSMutableString *sql = [[NSMutableString alloc] initWithFormat:@"UPDATE %@ %@", [modelClass andy_db_tableName], setSql];
-        if (where) {
-            [sql appendFormat:@" %@", where];
+        NSArray *setSqlArr = [setSql componentsSeparatedByString:@" "];
+        NSMutableString *setSqlM = [NSMutableString string];
+        for (NSString *str in setSqlArr)
+        {
+            NSString *key = str;
+            
+            NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+            if (replacedKeyDict != nil)
+            {
+                //找到已经被替换成了其他成员名称
+                NSString *replacedKey = replacedKeyDict[str];
+                if (replacedKey != nil)
+                {
+                    key = replacedKey;
+                }
+            }
+            
+            [setSqlM appendFormat:@" %@ ", key];
         }
+        
+        NSMutableString *sql = [[NSMutableString alloc] initWithFormat:@"UPDATE %@ %@", [modelClass andy_db_tableName], setSqlM];
+        if (where) {
+            NSArray<NSString *> * strArr = [where componentsSeparatedByString:@" "];
+            for (NSString * str in strArr)
+            {
+                NSString *tmpStr = str;
+                
+                NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+                if (replacedKeyDict != nil)
+                {
+                    //找到已经被替换成了其他成员名称
+                    NSString *replacedKey = replacedKeyDict[str];
+                    if (replacedKey != nil)
+                    {
+                        tmpStr = replacedKey;
+                    }
+                }
+                
+                [sql appendFormat:@" %@", tmpStr];
+            }
+        }
+
         [values addObjectsFromArray:arguments];
         
         [self recordWriteOperationForDatabaseInfo:databaseInfo];
@@ -784,21 +993,49 @@ static const double kTransactionTimeInterval = 1;
     }
     
     for (NSString *existingColumn in existingColumns) {
-        if (![columns containsObject:existingColumn]) {
+        
+        NSString *tmpColumn = existingColumn;
+        
+        NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+        if (replacedKeyDict != nil)
+        {
+            //找到已经被替换成了其他成员名称
+            NSString *replacedKey = [[replacedKeyDict allKeysForObject:tmpColumn] firstObject];
+            if (replacedKey != nil)
+            {
+                tmpColumn = replacedKey;
+            }
+        }
+        
+        if (![columns containsObject:tmpColumn]) {
             NSAssert(0, @"DB Error: No mapping for existing column '%@'", existingColumn);
         }
     }
     
     if ([existingColumns count] < [columns count]) {
         for (NSString *column in columns) {
-            if (![existingColumns containsObject:column]) {
+            
+            NSString *tmpColumn = column;
+            
+            NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+            if (replacedKeyDict != nil)
+            {
+                //找到已经被替换成了其他成员名称
+                NSString *replacedKey = replacedKeyDict[column];
+                if (replacedKey != nil)
+                {
+                    tmpColumn = replacedKey;
+                }
+            }
+            
+            if (![existingColumns containsObject:tmpColumn]) {
                 NSString *sql = [NSString stringWithFormat:@"ALTER TABLE %@ ADD COLUMN %@",
                                  [modelClass andy_db_tableName],
-                                 [self columnDefinitionForClass:modelClass property:[GYDCUtilities propertyForClass:modelClass column:column]]];
+                                 [self columnDefinitionForClass:modelClass property:[GYDCUtilities propertyForClass:modelClass column:tmpColumn]]];
                 [databaseQueue asyncInDatabase:^(FMDatabase *db) {
                     [db executeUpdate:sql];
                 }];
-                NSLog(@"DB Log: Add column '%@' for table '%@'.", column, [modelClass andy_db_tableName]);
+                NSLog(@"DB Log: Add column '%@' for table '%@'.", tmpColumn, [modelClass andy_db_tableName]);
             }
         }
     }
@@ -901,7 +1138,21 @@ static const double kTransactionTimeInterval = 1;
 - (NSArray *)columnDefinitionsForClass:(Class<GYModelObjectProtocol>)modelClass {
     NSMutableArray *columnDefinitions = [[NSMutableArray alloc] init];
     for (NSString *property in [self sortedPropertiesForClass:modelClass]) {
-        [columnDefinitions addObject:[self columnDefinitionForClass:modelClass property:property]];
+        
+        NSString *tmpProperty = property;
+        
+        NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+        if (replacedKeyDict != nil)
+        {
+            //找到已经被替换成了其他成员名称
+            NSString *replacedKey = replacedKeyDict[property];
+            if (replacedKey != nil)
+            {
+                tmpProperty = replacedKey;
+            }
+        }
+        
+        [columnDefinitions addObject:[self columnDefinitionForClass:modelClass property:tmpProperty]];
     }
     return columnDefinitions;
 }
@@ -923,6 +1174,17 @@ static const double kTransactionTimeInterval = 1;
 
 - (NSString *)columnDefinitionForClass:(Class<GYModelObjectProtocol>)modelClass property:(NSString *)property {
     NSString *column = [GYDCUtilities columnForClass:modelClass property:property];
+    
+    NSDictionary *replacedKeyDict = [modelClass andy_db_replacedKeyFromPropertyName];
+    if (replacedKeyDict != nil)
+    {
+        //找到已经被替换成了其他成员名称
+        NSString *replacedKey = [[replacedKeyDict allKeysForObject:property] firstObject];
+        if (replacedKey != nil)
+        {
+            property = replacedKey;
+        }
+    }
     
     NSMutableString *definition = nil;
     GYPropertyType propertyType = [[[modelClass andy_db_propertyTypes] objectForKey:property] unsignedIntegerValue];

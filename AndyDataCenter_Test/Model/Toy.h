@@ -15,7 +15,7 @@
 
 @property (nonatomic, copy) NSString *parentId;
 
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, copy) NSString *toyName;
 
 @property (nonatomic, assign) CGFloat price;
 

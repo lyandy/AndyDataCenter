@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "AndyDataCenter"
-  s.version      = "1.0.2"
+  s.version      = "1.0.3"
   s.summary      = "Provide an effective and efficent way to operate SQLite based on FMDB according to GYDataCenter"
 
   # This description is used to generate tags and improve search results.

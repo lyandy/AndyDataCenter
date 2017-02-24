@@ -7,6 +7,7 @@
 //
 
 #import "NSObject+DataCenter.h"
+#import "AndyDataCenterConst.h"
 
 #import "GYDataContext.h"
 #import "GYDCUtilities.h"
@@ -87,12 +88,12 @@
 #pragma mark - GYModelObjectProtocol
 
 + (NSString *)andy_db_dbName {
-    NSAssert(NO, @"%s : Should implement method in original class", __func__);
+    AndyDataCenterAssert(NO, @"%s : Should implement method in original class", __func__);
     return nil;
 }
 
 + (NSString *)andy_db_tableName {
-    NSAssert(NO, @"%s : Should implement method in original class", __func__);
+    AndyDataCenterAssert(NO, @"%s : Should implement method in original class", __func__);
     return nil;
 }
 
@@ -101,11 +102,15 @@
 }
 
 + (NSArray *)andy_db_persistentProperties {
-    NSAssert(NO, @"%s : Should implement method in original class", __func__);
     return nil;
 }
 
 + (NSDictionary *)andy_db_replacedKeyFromPropertyName
+{
+    return nil;
+}
+
++ (NSString *)andy_db_fullPath
 {
     return nil;
 }
@@ -214,6 +219,7 @@
         // http://stackoverflow.com/questions/4326350/how-do-i-wait-for-an-asynchronously-dispatched-block-to-finish
         // http://www.jianshu.com/p/7391ff7d343f
         // 这里处理这个 多个 Async Block 回调然后再执行的问题，要用group。semaphore针对单个任务信号可用
+        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_group_t group = dispatch_group_create();
         
         [((NSArray *)self) enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -226,27 +232,38 @@
             }];
         }];
         
-        dispatch_group_wait(group,  DISPATCH_TIME_FOREVER);
+//        // 方式1（不好，会卡住当前线程）
+//        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+//        ...
+//        
+//        // 方式2（比较好）
+//        dispatch_group_notify(group, mainQueue, ^{
+//            // 任务完成后，在主队列中做一些操作
+//            ...
+//        });
         
-        NSArray *failArr = [failArrM copy];
-        if (failArr.count == 0)
-        {
-            if (success)
+//        dispatch_group_wait(group,  DISPATCH_TIME_FOREVER);
+        dispatch_group_notify(group, queue, ^{
+            NSArray *failArr = [failArrM copy];
+            if (failArr.count == 0)
             {
-                success();
+                if (success)
+                {
+                    success();
+                }
             }
-        }
-        else
-        {
-            if (failure)
+            else
             {
-                failure(failArr);
+                if (failure)
+                {
+                    failure(failArr);
+                }
             }
-        }
+        });
     }
     else
     {
-        NSAssert(NO, @"%s : should be called by an array", __func__);
+        AndyDataCenterAssert(NO, @"%s : should be called by an array", __func__);
         
         if (failure)
         {

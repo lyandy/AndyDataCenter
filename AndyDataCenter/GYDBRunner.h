@@ -154,7 +154,7 @@ typedef NS_ENUM(NSInteger, GYSQLJoinType) {
           arguments:(NSArray *)arguments success:(void (^)())success failure:(void (^)(id error))failure;
 
 - (void)inTransaction:(dispatch_block_t)block
-               dbName:(NSString *)dbName;
+               dbName:(NSString *)dbName forClass:(Class<GYModelObjectProtocol>)modelClass ;
 
 - (void)vacuumAllDBs;
 

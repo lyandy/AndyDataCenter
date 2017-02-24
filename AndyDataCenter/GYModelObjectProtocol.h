@@ -62,6 +62,14 @@ typedef NS_ENUM(NSUInteger, GYCacheLevel) {
  */
 + (NSDictionary *)andy_db_replacedKeyFromPropertyName;
 
+
+/**
+ 数据库位置的全路径, 如果不实现则 数据库位置 位于 NSDocumentDirectory 根目录下。
+
+ @return 数据库位置的全路径
+ */
++ (NSString *)andy_db_fullPath;
+
 + (NSDictionary *)andy_db_propertyTypes;
 + (NSDictionary *)andy_db_propertyClasses;
 + (NSSet *)andy_db_relationshipProperties;

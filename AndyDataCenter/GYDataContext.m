@@ -10,6 +10,7 @@
 
 #import "GYDCUtilities.h"
 #import "GYModelObjectProtocol.h"
+#import "AndyDataCenterConst.h"
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
 
@@ -107,9 +108,9 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 - (id)getObject:(Class<GYModelObjectProtocol>)modelClass
      properties:(NSArray *)properties
      primaryKey:(id)primaryKey {
-    NSAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
+    AndyDataCenterAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
     if (!primaryKey) {
-        NSAssert(NO, @"primaryKey cannot be nil");
+        AndyDataCenterAssert(NO, @"primaryKey cannot be nil");
         return nil;
     }
     
@@ -206,7 +207,7 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 - (NSArray *)getIds:(Class<GYModelObjectProtocol>)modelClass
               where:(NSString *)where
           arguments:(NSArray *)arguments {
-    NSAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
+    AndyDataCenterAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
     
     GYDataContextQueue *queue = [self queueForDBName:[modelClass andy_db_dbName]];
     __block NSArray *result;
@@ -235,7 +236,7 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 
 - (void)saveObject:(id<GYModelObjectProtocol>)object success:(void (^)())success failure:(void (^)(id error))failure {
     if (!object) {
-        NSAssert(NO, @"Object cannot be nil");
+        AndyDataCenterAssert(NO, @"Object cannot be nil");
         
         if (failure)
         {
@@ -269,9 +270,9 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 
 - (void)deleteObject:(Class<GYModelObjectProtocol>)modelClass
           primaryKey:(id)primaryKey success:(void (^)())success failure:(void (^)(id error))failure {
-    NSAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
+    AndyDataCenterAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
     if (!primaryKey) {
-        NSAssert(NO, @"primaryKey cannot be nil");
+        AndyDataCenterAssert(NO, @"primaryKey cannot be nil");
         
         if (failure)
         {
@@ -324,9 +325,9 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 - (void)updateObject:(Class<GYModelObjectProtocol>)modelClass
                  set:(NSDictionary *)set
           primaryKey:(id)primaryKey {
-    NSAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
+    AndyDataCenterAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
     if (!primaryKey) {
-        NSAssert(NO, @"primaryKey cannot be nil");
+        AndyDataCenterAssert(NO, @"primaryKey cannot be nil");
         return;
     }
     
@@ -344,9 +345,9 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 - (id)updateAndReturnObject:(Class<GYModelObjectProtocol>)modelClass
                         set:(NSDictionary *)set
                  primaryKey:(id)primaryKey success:(void (^)())success failure:(void (^)(id error))failure {
-    NSAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
+    AndyDataCenterAssert([modelClass andy_db_primaryKey], @"This method is for class that has a primary key.");
     if (!primaryKey) {
-        NSAssert(NO, @"primaryKey cannot be nil");
+        AndyDataCenterAssert(NO, @"primaryKey cannot be nil");
         
         if (failure)
         {
@@ -500,7 +501,7 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 
 - (GYDataContextQueue *)queueForDBName:(NSString *)dbName {
     if (!dbName.length) {
-        NSAssert(NO, @"db name cannot be nil");
+        AndyDataCenterAssert(NO, @"db name cannot be nil");
         return nil;
     }
     
@@ -533,7 +534,7 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 }
 
 - (NSString *)whereIdSqlForClass:(Class<GYModelObjectProtocol>)modelClass {
-    NSAssert([modelClass andy_db_primaryKey], @"modelClass must have primary key");
+    AndyDataCenterAssert([modelClass andy_db_primaryKey], @"modelClass must have primary key");
     
     static const void * const kWhereIdSqlKey = &kWhereIdSqlKey;
     NSString *sql = objc_getAssociatedObject(modelClass, kWhereIdSqlKey);

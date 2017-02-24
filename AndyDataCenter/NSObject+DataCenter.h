@@ -19,7 +19,6 @@
  */
 + (instancetype)andy_db_objectForId:(id)primaryKey;
 
-
 /**
  根据条件查询到数据Model组成的数组。注意 参数 表字段名称或Model属性名称 大小写
 

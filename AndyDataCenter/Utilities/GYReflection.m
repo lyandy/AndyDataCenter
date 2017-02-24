@@ -7,6 +7,7 @@
 //
 
 #import "GYReflection.h"
+#import "AndyDataCenterConst.h"
 
 #import <objc/runtime.h>
 
@@ -82,7 +83,7 @@
                 } else if ([attributes hasPrefix:@"T*"]) {
                     type = @"char *";
                 } else {
-                    NSAssert(0, @"Unkonwn type");
+                    AndyDataCenterAssert(0, @"Unkonwn type");
                 }
             }
             [propertyTypeMap setObject:type forKey:propertyName];

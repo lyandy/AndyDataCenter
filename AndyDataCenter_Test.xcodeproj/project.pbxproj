@@ -24,6 +24,7 @@
 		B625CAAC1E093F0700FCEC16 /* NSObject+DataCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = B625CAAB1E093F0700FCEC16 /* NSObject+DataCenter.m */; };
 		B625CAAE1E09419B00FCEC16 /* AndyDataCenter.db in Resources */ = {isa = PBXBuildFile; fileRef = B625CAAD1E09419B00FCEC16 /* AndyDataCenter.db */; };
 		B625CAB21E0941B400FCEC16 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = B625CAB11E0941B400FCEC16 /* Person.m */; };
+		B6C724AD1E5FE86000304421 /* AndyDataCenterConst.m in Sources */ = {isa = PBXBuildFile; fileRef = B6C724AC1E5FE86000304421 /* AndyDataCenterConst.m */; };
 		B6F1B8A21E0A7D1C003EBF2C /* Toy.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B8A11E0A7D1C003EBF2C /* Toy.m */; };
 		B6F1B8A51E0A7D29003EBF2C /* School.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B8A41E0A7D29003EBF2C /* School.m */; };
 		B6F1B8A81E0A976E003EBF2C /* Road.m in Sources */ = {isa = PBXBuildFile; fileRef = B6F1B8A71E0A976E003EBF2C /* Road.m */; };
@@ -83,6 +84,8 @@
 		B625CAAD1E09419B00FCEC16 /* AndyDataCenter.db */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AndyDataCenter.db; sourceTree = "<group>"; };
 		B625CAB01E0941B400FCEC16 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		B625CAB11E0941B400FCEC16 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		B6C724AB1E5FE86000304421 /* AndyDataCenterConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AndyDataCenterConst.h; sourceTree = "<group>"; };
+		B6C724AC1E5FE86000304421 /* AndyDataCenterConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AndyDataCenterConst.m; sourceTree = "<group>"; };
 		B6F1B8A01E0A7D1C003EBF2C /* Toy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Toy.h; sourceTree = "<group>"; };
 		B6F1B8A11E0A7D1C003EBF2C /* Toy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Toy.m; sourceTree = "<group>"; };
 		B6F1B8A31E0A7D29003EBF2C /* School.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = School.h; sourceTree = "<group>"; };
@@ -214,6 +217,8 @@
 				B625CA991E093E8C00FCEC16 /* GYDBRunner.m */,
 				B625CA9C1E093E8C00FCEC16 /* GYModelObjectProtocol.h */,
 				B625CA9D1E093E8C00FCEC16 /* Utilities */,
+				B6C724AB1E5FE86000304421 /* AndyDataCenterConst.h */,
+				B6C724AC1E5FE86000304421 /* AndyDataCenterConst.m */,
 			);
 			path = AndyDataCenter;
 			sourceTree = "<group>";
@@ -449,6 +454,7 @@
 				B625CA661E093D9600FCEC16 /* ViewController.m in Sources */,
 				B625CAA61E093E8C00FCEC16 /* GYDCUtilities.m in Sources */,
 				B625CA631E093D9600FCEC16 /* AppDelegate.m in Sources */,
+				B6C724AD1E5FE86000304421 /* AndyDataCenterConst.m in Sources */,
 				B625CA601E093D9600FCEC16 /* main.m in Sources */,
 				B6F1B8A21E0A7D1C003EBF2C /* Toy.m in Sources */,
 				B6F1B8A51E0A7D29003EBF2C /* School.m in Sources */,

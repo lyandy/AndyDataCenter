@@ -205,7 +205,7 @@
 
 - (void)andy_db_saveArrayObjects
 {
-    [self andy_db_saveObjectSuccess:nil failure:nil];
+    [self andy_db_saveArrayObjectsSuccess:nil failure:nil];
 }
 
 - (void)andy_db_saveArrayObjectsSuccess:(void (^)())success failure:(void (^)(id error))failure

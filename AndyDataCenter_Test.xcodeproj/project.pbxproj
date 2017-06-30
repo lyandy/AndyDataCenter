@@ -328,7 +328,7 @@
 				TargetAttributes = {
 					B625CA5A1E093D9600FCEC16 = {
 						CreatedOnToolsVersion = 8.2;
-						DevelopmentTeam = M3954NS6ZG;
+						DevelopmentTeam = 37PBFNZ5HH;
 						ProvisioningStyle = Automatic;
 					};
 					B625CA731E093D9600FCEC16 = {
@@ -607,7 +607,7 @@
 			baseConfigurationReference = 5836C54050661FB99D139312 /* Pods-AndyDataCenter_Test.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = M3954NS6ZG;
+				DEVELOPMENT_TEAM = 37PBFNZ5HH;
 				INFOPLIST_FILE = AndyDataCenter_Test/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -622,7 +622,7 @@
 			baseConfigurationReference = 06E1820319922722622FE1C4 /* Pods-AndyDataCenter_Test.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = M3954NS6ZG;
+				DEVELOPMENT_TEAM = 37PBFNZ5HH;
 				INFOPLIST_FILE = AndyDataCenter_Test/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
